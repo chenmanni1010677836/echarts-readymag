@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>听障毕业生专业分布</title>
+  <!-- 改用国内快的 ECharts CDN，避免加载慢 -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    /* 消除白边、适配 iframe 100% 显示 */
+    * {margin:0;padding:0;box-sizing:border-box}
+    html,body {width:100%;height:100%;overflow:hidden;background:transparent}
+    #main {width:100%;height:100%}
+  </style>
+</head>
+<body>
+<div id="main"></div>
+<script>
+// 初始化图表
+const chartDom = document.getElementById('main');
+const myChart = echarts.init(chartDom);
+
+// 你的半环形饼图配置（直接用你提供的 option，保留自动轮播逻辑）
+var currentIndex = 0;
+var timer = null;
+const option = {
+  backgroundColor: 'transparent', // 关键：背景透明，适配 Readymag 页面
+  tooltip: {
+    trigger: 'item',
+    formatter: '{b}: {c}人 ({d}%)'
+  },
+  legend: {
+    top: '5%',
+    left: 'center'
+  },
+  series: [
+    {
+      name: '听障应届毕业生专业分布',
+      type: 'pie',
+      radius: ['40%', '70%'],
+      center: ['50%', '70%'],
+      startAngle: 180,
+      endAngle: 360,
+      color: ['#eeb8ec', '#ffb2b5', '#ffbd6c'],
+      data: [
+        { value: 446, name: '计算机/设计/新媒体' },
+        { value: 3154, name: '其他专业' }
+      ]
+    }
+  ]
+};
+
+// 设置图表配置
+myChart.setOption(option);
+
+// 保留自动轮播逻辑（和你原代码一致）
+function autoPlay() {
+  var dataLen = option.series[0].data.length;
+  myChart.dispatchAction({type: 'downplay', seriesIndex: 0});
+  myChart.dispatchAction({type: 'highlight', seriesIndex: 0, dataIndex: currentIndex});
+  myChart.dispatchAction({type: 'showTip', seriesIndex: 0, dataIndex: currentIndex});
+  currentIndex = (currentIndex + 1) % dataLen;
+}
+timer = setInterval(autoPlay, 3000);
+myChart.on('mouseover', () => clearInterval(timer));
+myChart.on('mouseout', () => timer = setInterval(autoPlay, 3000));
+
+// 关键：iframe 缩放时图表自适应
+window.addEventListener('resize', () => myChart.resize());
+</script>
+</body>
+</html>
